@@ -15,6 +15,7 @@ Solution:
   - Ensure thinking: enabled is always set (required by reasoning_effort).
   - Convert redacted_thinking blocks back to thinking blocks for DeepSeek
     (DeepSeek only accepts `thinking`, not `redacted_thinking`).
+  - Auto-restart: Crash-resistant with auto-recovery loop.
 
 One-time setup: run with --install to trust the self-signed cert.
 """
@@ -182,6 +183,19 @@ class ProxyHandler(BaseHTTPRequestHandler):
         pass  # Suppress default logging; we do our own
 
     def _forward(self):
+        try:
+            self._forward_inner()
+        except Exception as e:
+            print(f"[{time.strftime('%H:%M:%S')}] UNHANDLED: {type(e).__name__}: {e}", flush=True)
+            try:
+                self.send_response(502)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": f"proxy error: {e}"}).encode())
+            except Exception:
+                pass
+
+    def _forward_inner(self):
         length = int(self.headers.get("Content-Length", 0))
         body = self.rfile.read(length)
 
@@ -318,6 +332,7 @@ def generate_cert():
 
 def uninstall_cert():
     """Remove CA cert from system trust store and delete cert files."""
+    import shutil
     system = platform.system()
 
     if system == "Windows":
@@ -331,7 +346,6 @@ def uninstall_cert():
             capture_output=True, text=True
         )
 
-    import shutil
     if os.path.exists(CERT_DIR):
         shutil.rmtree(CERT_DIR)
     print("[proxy] Certificates removed.")
@@ -375,20 +389,36 @@ def main():
 
     port = int(sys.argv[1]) if len(sys.argv) > 1 else 9191
 
-    ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-    ctx.load_cert_chain(CERT_FILE)
+    # Auto-restart loop: if the server crashes, restart it automatically
+    while True:
+        try:
+            ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            ctx.load_cert_chain(CERT_FILE)
 
-    server = HTTPServer(("127.0.0.1", port), ProxyHandler)
-    server.socket = ctx.wrap_socket(server.socket, server_side=True)
+            server = HTTPServer(("127.0.0.1", port), ProxyHandler)
+            server.socket = ctx.wrap_socket(server.socket, server_side=True)
 
-    print(f"[proxy] https://127.0.0.1:{port} -> {DEEPSEEK_URL}", flush=True)
-    print(f"[proxy] Set ANTHROPIC_BASE_URL=https://127.0.0.1:{port}", flush=True)
-    print("[proxy] Strategy: cache thinking from responses, inject into requests when missing", flush=True)
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        print("\n[proxy] Shutting down.")
-        server.shutdown()
+            print(f"[proxy] https://127.0.0.1:{port} -> {DEEPSEEK_URL}", flush=True)
+            print(f"[proxy] Set ANTHROPIC_BASE_URL=https://127.0.0.1:{port}", flush=True)
+            print("[proxy] Auto-restart enabled — will recover from crashes", flush=True)
+            server.serve_forever()
+        except KeyboardInterrupt:
+            print("\n[proxy] Shutting down.")
+            try:
+                server.shutdown()
+            except Exception:
+                pass
+            break
+        except OSError as e:
+            if "10048" in str(e) or "Address already in use" in str(e):
+                print(f"[proxy] Port {port} already in use, retrying in 5s...", flush=True)
+                time.sleep(5)
+                continue
+            print(f"[proxy] OSError: {e}, restarting in 3s...", flush=True)
+            time.sleep(3)
+        except Exception as e:
+            print(f"[proxy] Crash: {type(e).__name__}: {e}, restarting in 3s...", flush=True)
+            time.sleep(3)
 
 
 if __name__ == "__main__":
