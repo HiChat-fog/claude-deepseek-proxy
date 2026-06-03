@@ -6,7 +6,9 @@
 3. 更多轮次以获得统计显著性
 4. 同时测试 Anthropic 和 Native 端点
 """
-import os, json, time
+import os
+import json
+import time
 import anthropic
 import openai
 

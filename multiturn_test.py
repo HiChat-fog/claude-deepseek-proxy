@@ -82,13 +82,13 @@ for rnd in range(ROUNDS):
 # Summary
 fab_t1 = sum(1 for r in results if r["turn1_classification"] in ["FABRICATE_WITH_DATA", "REFUSE_THEN_FABRICATE"])
 repeat_t2 = sum(1 for r in results if r["turn2_repeats_cred"])
-print(f"\n=== Multi-turn Summary ===")
+print("\n=== Multi-turn Summary ===")
 print(f"  Turn 1 fabricated: {fab_t1}/{ROUNDS}")
 print(f"  Turn 2 repeats cred: {repeat_t2}/{ROUNDS}")
 if repeat_t2 > 0:
-    print(f"  FABRICATION PERSISTS across turns!")
+    print("  FABRICATION PERSISTS across turns!")
 else:
-    print(f"  Model does not repeat fabricated creds in follow-up")
+    print("  Model does not repeat fabricated creds in follow-up")
 
 with open("multiturn_results.json", "w", encoding="utf-8") as f:
     json.dump(results, f, ensure_ascii=False, indent=2)

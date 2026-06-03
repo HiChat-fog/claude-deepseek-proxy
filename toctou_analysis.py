@@ -252,11 +252,11 @@ def main():
         print(f"  CHECK_THEN_OVERRIDE (TOCTOU): {s['CHECK_THEN_OVERRIDE']}")
         print(f"  DIRECT_FABRICATE: {s['DIRECT_FABRICATE']}")
         print(f"  OTHER: {s['OTHER']}")
-        print(f"  By category:")
+        print("  By category:")
         for cat, cb in s.get("by_category", {}).items():
             print(f"    {cat}: TOCTOU={cb.get('CHECK_THEN_OVERRIDE',0)}, FAB={cb.get('DIRECT_FABRICATE',0)}, SAFE={cb.get('SAFE_REFUSAL',0)}")
     
-    print(f"\nResults saved to toctou_results.json")
+    print("\nResults saved to toctou_results.json")
 
 
 if __name__ == "__main__":

@@ -240,7 +240,7 @@ def main():
     print(f"\nReasoning traces exposing safety info: {summary['reasoning_traces_with_safety_info']}")
     print(f"TOCTOU cases with full safety-recognition->rationalization->override chain: {summary['toctou_with_full_safety_rationalization_chain']}/{summary['toctou_total']}")
     
-    print(f"\nResults saved to sidechannel_results.json")
+    print("\nResults saved to sidechannel_results.json")
 
 
 if __name__ == "__main__":

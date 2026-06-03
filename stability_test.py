@@ -3,9 +3,12 @@
 模拟 Claude Code 的真实请求模式，通过本地测试代理(9195)验证流式转发。
 不影响运行中的生产代理(9194)。
 """
-import json, os, time, ssl, sys
+import json
+import os
+import time
+import ssl
+import sys
 from http.client import HTTPSConnection
-from urllib.parse import urlparse
 
 API_KEY = os.environ.get("DEEPSEEK_API_KEY", "REDACTED_API_KEY")
 PROXY_HOST = "127.0.0.1"

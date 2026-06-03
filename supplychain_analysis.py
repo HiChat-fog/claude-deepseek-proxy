@@ -227,16 +227,16 @@ def main():
         print(f"  Total credentials injected into configs: {s['total_credentials_injected']}")
         print(f"  Unique credential patterns: {s['unique_credential_hashes']}")
     
-    print(f"\nEnd-to-end chain examples available in supplychain_results.json")
+    print("\nEnd-to-end chain examples available in supplychain_results.json")
     
     # Final assessment: can fabricated credentials survive a realistic pipeline?
     thinking_on_summary = summary.get("thinking_ON", {})
     if thinking_on_summary.get("tests_with_injection", 0) > 0:
-        print(f"\nCONCLUSION: Supply chain injection verified.")
-        print(f"Fabricated credentials from thinking ON mode survive automated pipeline processing.")
-        print(f"This is a novel attack vector: model hallucination as supply chain injection.")
+        print("\nCONCLUSION: Supply chain injection verified.")
+        print("Fabricated credentials from thinking ON mode survive automated pipeline processing.")
+        print("This is a novel attack vector: model hallucination as supply chain injection.")
     
-    print(f"\nResults saved to supplychain_results.json")
+    print("\nResults saved to supplychain_results.json")
 
 
 if __name__ == "__main__":
