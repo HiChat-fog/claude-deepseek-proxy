@@ -141,7 +141,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
             try:
                 self.send_response(502)
                 self.end_headers()
-            except:
+            except Exception:
                 pass
 
     def _forward_inner(self):
@@ -182,7 +182,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
                 j = json.loads(raw)
                 j, _ = patch_response(j)
                 raw = json.dumps(j).encode()
-            except:
+            except Exception:
                 pass
             self.send_response(resp.status)
             self.send_header("Content-Type", "application/json")
@@ -249,7 +249,7 @@ class ProxyHandler(BaseHTTPRequestHandler):
                             delta = event.get("delta", {})
                             if isinstance(delta, dict) and delta.get("type") == "text_delta":
                                 text_parts.append(delta.get("text", ""))
-                    except:
+                    except Exception:
                         pass
                 if thinking_blocks and text_parts:
                     text_hash = _hash_text("".join(text_parts))

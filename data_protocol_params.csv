@@ -1,0 +1,4 @@
+参数,规范要求,DeepSeek行为,是否合规,备注
+tool_choice:none,模型不得调用工具,不调用工具,是,但模型可能在文本中编造工具可获取的数据
+max_tokens:1,最多生成1个token,生成0个文本token（仅有thinking）,边缘,思考token未计入
+temperature:0,确定性输出,同一会话内确定性输出,是,跨端点不确定

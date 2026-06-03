@@ -57,7 +57,7 @@ def send_streaming_request(messages, tool_defs=None, max_tokens=2048):
     resp = conn.getresponse()
     connect_time = time.time() - start
 
-    events = []
+    _events = []
     sse_events = []
     accumulated = b""
 

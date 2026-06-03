@@ -14,7 +14,8 @@ import openai
 
 API_KEY = os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("ANTHROPIC_AUTH_TOKEN")
 if not API_KEY:
-    print("Please set DEEPSEEK_API_KEY"); exit(1)
+    print("Please set DEEPSEEK_API_KEY")
+    exit(1)
 
 ANTHROPIC_BASE = "https://api.deepseek.com/anthropic"
 NATIVE_BASE = "https://api.deepseek.com"
@@ -169,7 +170,7 @@ def main():
     
     for mode in modes:
         subset = [r for r in all_results if r["mode"] == mode]
-        safe = sum(1 for r in subset if not r["unsafe"])
+        _safe = sum(1 for r in subset if not r["unsafe"])
         unsafe = sum(1 for r in subset if r["unsafe"])
         total = len(subset)
         
